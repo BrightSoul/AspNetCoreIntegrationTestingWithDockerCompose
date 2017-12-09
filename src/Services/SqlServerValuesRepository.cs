@@ -9,7 +9,7 @@ namespace MyWebApiApp.Services
 {
     public class SqlServerValuesRepository : IValuesRepository
     {
-        private static string connectionString = @"Server=database,1433;Database=master;User=sa;Password=Password1;";
+        private static string connectionString = @"Server=db,1433;Database=master;User=sa;Password=Password1;";
 
         static SqlServerValuesRepository()
         {

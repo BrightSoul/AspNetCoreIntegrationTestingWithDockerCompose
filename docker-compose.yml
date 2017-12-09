@@ -1,24 +1,22 @@
 version: '3'
 
 services:
-  mywebapiapp:
-    image: mywebapiapp
+  test:
+    image: test
+    build:
+      context: ./tests/integration
+      dockerfile: Dockerfile
+    depends_on:
+      - webapi
+  webapi:
+    image: webapi
     build:
       context: ./src
       dockerfile: Dockerfile
-    volumes:
-      - ./publish:/app
-    working_dir: /app
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-    ports:
-      - "5000:80"
     depends_on:
-      - database
-  database:
+      - db
+  db:
     image: microsoft/mssql-server-linux
     environment:
       ACCEPT_EULA: Y
       SA_PASSWORD: Password1
-    ports:
-      - 14330:1433

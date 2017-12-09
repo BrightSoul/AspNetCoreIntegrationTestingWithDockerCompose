@@ -1,13 +1,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
 using System.Net.Http;
-using System.Data.SqlClient;
 using System.Text;
-using System;
 using Newtonsoft.Json;
-using MyWebApiApp.Models;
-using System.Collections.Generic;
-using System.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace MyWebApiApp.IntegrationTests
 {
@@ -15,23 +11,24 @@ namespace MyWebApiApp.IntegrationTests
     [TestCategory("Integration")]
     public class IntegrationTest1
     {
-        private const string webApiBaseUrl = "http://localhost:5000/api";
+        private const string webApiBaseUrl = "http://webapi/api";
         [TestMethod]
         public async Task ShouldRetrieveValuesThatWereInsertedBefore()
         {
-			using (var client = new HttpClient())
+            using (var client = new HttpClient())
             {
                 var expectedValue = "aspitalia";
                 var valuesEndpoint = $"{webApiBaseUrl}/values";
-                
+
                 //Inviamo vere e proprie richieste HTTP per inserire un valore e recuperare l'elenco dei valori esistenti
                 //Trattandosi di un integration test, il valore verrà scritto dalla WebAPI nel database e recuperato da lì
                 await client.PostAsync(valuesEndpoint, new StringContent(JsonConvert.SerializeObject(expectedValue), Encoding.UTF8, "application/json"));
                 var response = await client.GetStringAsync(valuesEndpoint);
-                var values = JsonConvert.DeserializeObject<List<ValueDto>>(response);
+                var values = JsonConvert.DeserializeObject(response) as JArray;
 
+                Assert.IsNotNull(values);
                 Assert.AreEqual(1, values.Count);
-                Assert.AreEqual(expectedValue, values.First().Value);
+                Assert.AreEqual(expectedValue, values[0].Value<string>("value"));
             }
         }
     }
